@@ -16,21 +16,27 @@
 (def slow-chan (throttle-chan in persec :second))
 ;(def slow-chan (throttle-chan in 1 :millisecond))
 
+(def not-nil? (complement nil?))
+
 (defn showThreadId []
   "Getting thread-id of this processing"
   (.getId (Thread/currentThread)))
 
 (defn showResponse
   "Showing corespondent response."
-  [res status body]
-  (println (str status " " res)))
+  [object status body]
+  (println (str status " "
+                (- (System/currentTimeMillis) (:start object)) " "
+                (:line object) " (" (:threadid object) ")")))
 
 (defn postEachLine
   "Post the given data with http-kit client."
   [line]
   (http/postItem
    hosturl userid tuplename line
-   (partial showResponse (clojure.string/trim-newline (str line " (" (showThreadId) ")")))))
+   (partial showResponse {:line line
+                          :threadid (showThreadId)
+                          :start (System/currentTimeMillis)})))
 
 (defn async-kicker
   "Start num-consumers threads that will consume work from the slow-chan"
@@ -39,7 +45,7 @@
     (thread
       (while true
         (let [line (<!! slow-chan)]
-          (postEachLine line))))))
+          (postEachLine (clojure.string/trim-newline line)))))))
 
 (defn -main
   "Main function called via 'lein run'"
