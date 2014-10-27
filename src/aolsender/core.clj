@@ -7,14 +7,18 @@
 
 ; ---
 (def persec 3)
-(def userid "544a65950cf28a00f105fb79")
+(def userid "544e47370cf290158766171d")
 (def tuplename "RequestPacket")
-(def hosturl "127.0.0.1:9191")
+(def hosturl "192.168.30.10:9191")
 ; ---
 
 (def in (chan 1))
 (def slow-chan (throttle-chan in persec :second))
 ;(def slow-chan (throttle-chan in 1 :millisecond))
+
+(defn showThreadId []
+  "Getting thread-id of this processing"
+  (.getId (Thread/currentThread)))
 
 (defn showResponse
   "Showing corespondent response."
@@ -26,7 +30,7 @@
   [line]
   (http/postItem
    hosturl userid tuplename line
-   (partial showResponse (clojure.string/trim-newline line))))
+   (partial showResponse (clojure.string/trim-newline (str line " (" (showThreadId) ")")))))
 
 (defn async-kicker
   "Start num-consumers threads that will consume work from the slow-chan"
