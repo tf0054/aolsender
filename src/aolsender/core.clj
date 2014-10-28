@@ -7,8 +7,8 @@
 
 ; ---
 (def persec 3)
-(def userid "544e47370cf290158766171d")
-(def tuplename "RequestPacket")
+(def userid "544a65950cf28a00f105fb79")
+(def tuplename "queryTuple")
 (def hosturl "192.168.30.10:9191")
 ; ---
 

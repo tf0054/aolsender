@@ -10,14 +10,14 @@
 
 (defmulti contentCheck class)
 (defmethod contentCheck String [objContent]
-  (json/write-str objContent))
-(defmethod contentCheck :default [objContent]
   objContent)
+(defmethod contentCheck :default [objContent]
+  (json/write-str objContent))
 
 (defn postItem [strBaseUrl strUid strTupleName objContent func]
   ; http://shenfeng.me/async-clojure-http-client.html
   ; http://www.markhneedham.com/blog/2013/09/26/clojure-writing-json-to-a-filereading-json-from-a-file/
-  (let [options {:headers {"Content-type" "application/json"}
+  (let [options {:headers {"Content-Type" "application/json"}
                  :body (contentCheck objContent)
                  }]
 
