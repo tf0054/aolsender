@@ -6,11 +6,7 @@ A Clojure library designed to test genn.ai with AOL search query data.
 
 ### exec
 
-```
-cat gaute/user-ct-test-collection-01.txt.head1000.json | ~/bin/lein run
-```
-
-Your tuple schema and query should be below.
+First your tuple schema and query should be made like this.
 
 ```
 gungnir> CREATE TUPLE queryTuple ( uid STRING, query STRING, time TIMESTAMP('yyyy-MM-dd HH:mm:ss'), rank STRING, url STRING);
@@ -19,7 +15,13 @@ gungnir> FROM queryTuple USING kafka_spout() FILTER url LIKE '%www%' EMIT uid, u
 OK
 ```
 
-Your kafka can get the calculated output like this.
+And then you can execute aolsender like this.
+
+```
+cat gaute/user-ct-test-collection-01.txt.head1000.json | ~/bin/lein run
+```
+
+After the execution, your kafka can get the calculated output and it can be checked through kafka-console-consumer.sh
 
 ```
 [vagrant@localhost ~]$ /opt/kafka/bin/kafka-console-consumer.sh  --topic test_input_urls --zookeeper localhost:2181
