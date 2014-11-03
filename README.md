@@ -18,7 +18,7 @@ OK
 And then you can execute aolsender like this.
 
 ```
-cat gaute/user-ct-test-collection-01.txt.head1000.json | ~/bin/lein run
+cat gaute/user-ct-test-collection-01.txt.head1000.json| lein run -- -t queryTuple -u 544a65950cf28a00f105fb79 -s 192.168.30.10:9191
 ```
 
 After the execution, your kafka can get the calculated output and it can be checked through kafka-console-consumer.sh

@@ -17,7 +17,7 @@
    ["-u" "--userid A" "REQUIRED: Target user name you want to send"
     :id :userid
     :default nil]
-   ["-s" "--server localhost:2181" "gungnir server address"
+   ["-s" "--server localhost:9191" "gungnir server address"
     :id :hosturl
     :default "internal-vagrant.genn.ai:9191"]
    ["-l" "--limit 10" "Reset per millsec"
