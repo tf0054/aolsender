@@ -13,6 +13,15 @@ gungnir> CREATE TUPLE queryTuple ( uid STRING, query STRING, time TIMESTAMP('yyy
 OK
 gungnir> FROM queryTuple USING kafka_spout() FILTER url LIKE '%www%' EMIT uid, url USING kafka_emit('test_input_urls');
 OK
+gungnir> submit topology aol_simple;
+OK
+Starting ... Done
+{"id":"54c14b920cf23a5b010d91fe","name":"aol_simple","status":"RUNNING","owner":"gennai","createTime":"2015-01-22T19:12:18.718Z","summary":{"name":"gungnir_54c14b920cf23a5b010d91fe","status":"ACTIVE","uptimeSecs":1,"numWorkers":1,"numExecutors":3,"numTasks":3}}
+gungnir> 
+gungnir> post queryTuple {"uid":"142","query":"westchester.gov","time":"2006-03-20 03:55:57","rank":"1","url":"http://www.westchestergov.com"};
+POST /gungnir/v0.1/54c141230cf23a5b010d91fc/queryTuple/json
+OK
+gungnir>
 ```
 
 And then you can execute aolsender like this.
