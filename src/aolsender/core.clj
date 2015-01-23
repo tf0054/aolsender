@@ -11,15 +11,12 @@
 (def cli-options
   ;definitions of option
   ;long option should have an exampleo in it....
-  [["-t" "--tuple A" "REQUIRED: Target tuple name you want to send"
-    :id :tuplename
+  [["-u" "--urlpath /gungnir/-+-+/json" "REQUIRED: Target url path you want to send"
+    :id :urlpath
     :default nil]
-   ["-u" "--userid A" "REQUIRED: Target user name you want to send"
-    :id :userid
-    :default nil]
-   ["-s" "--server localhost:9191" "gungnir server address"
-    :id :hosturl
-    :default "internal-vagrant.genn.ai:9191"]
+   ["-s" "--server localhost:7200" "gungnir server address"
+    :id :hostname
+    :default "internal-vagrant.genn.ai:7200"]
    ["-l" "--limit 10" "Reset per millsec"
     :id :persec
     :default 10]
@@ -64,7 +61,7 @@
   "Post the given data with http-kit client."
   [options line]
   (http/postItem
-   (:hosturl options) (:userid options) (:tuplename options) line
+   (:hostname options) (:urlpath options) line
    (partial showResponse {:line line
                           :threadid (showThreadId)
                           :start (System/currentTimeMillis)})))
@@ -85,12 +82,8 @@
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (if (:help options)
       (exit 0 (usage summary)))
-    (if (nil? (:tuplename options))
-      (do (println "Tuple name have to be defined using \"-t\" option")
-        (exit 0 (usage summary)))
-      (println "Tuple: " (:tuplename options)))
-    (if (nil? (:userid options))
-      (do (println "Userid have to be defined using \"-t\" option")
+    (if (nil? (:urlpath options))
+      (do (println "Url path have to be defined using \"-t\" option")
         (exit 0 (usage summary)))
       (println "Userid: " (:userid options)))
     (println (str "aolsender started with " (:persec options) " per sec limit."))
