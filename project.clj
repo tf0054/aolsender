@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/data.json "0.2.4"]
                  [org.clojure/tools.cli "0.3.1"]
+                 [org.clojure/data.json "0.2.5"]
                  [com.taoensso/timbre "3.2.1"]
                  [http-kit "2.1.18"]
                  [throttler "1.0.0"]

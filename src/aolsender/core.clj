@@ -2,6 +2,7 @@
   (:use [clojure.pprint])
   (:require
    [aolsender.http :as http]
+   [aolsender.genfunc :as genf]
    [throttler.core :refer [throttle-chan]]
    [clojure.string :as string]
    [clojure.tools.cli :refer [parse-opts]]
@@ -11,16 +12,18 @@
 (def cli-options
   ;definitions of option
   ;long option should have an exampleo in it....
-  [["-u" "--urlpath /gungnir/-+-+/json" "REQUIRED: Target url path you want to send"
+  [["-u" "--url /gungnir/-/json" "REQUIRED: Target url path you want to send"
     :id :urlpath
     :default nil]
-   ["-s" "--server localhost:7200" "gungnir server address"
+   ["-g" "--genfunc func" "APENDIX: Generate test tuples using functions"
+    :id :genfunc]
+   ["-s" "--server host:7200" "gungnir server address"
     :id :hostname
-    :default "internal-vagrant.genn.ai:7200"]
+    :default "localhost:7200"]
    ["-l" "--limit 10" "Reset per millsec"
     :id :persec
     :default 10]
-   ["-n" "--numthread 8" "Num of Sending threads"
+   ["-n" "--numthrd 8" "Num of Sending threads"
     :id :numthread
     :default 8]
    ["-h" "--help" "Show this help msg"]])
@@ -30,7 +33,7 @@
   (System/exit status))
 
 (defn usage [options-summary]
-  (->> ["This is my program. There are many like it, but this one is mine."
+  (->> ["This program can read data lines via STDIN."
         ""
         "Usage: program-name [options] action"
         ""
@@ -84,11 +87,19 @@
       (exit 0 (usage summary)))
     (if (nil? (:urlpath options))
       (do (println "Url path have to be defined using \"-t\" option")
-        (exit 0 (usage summary)))
-      (println "Userid: " (:userid options)))
+        (exit 0 (usage summary))))
     (println (str "aolsender started with " (:persec options) " per sec limit."))
-    ;(pprint options)(exit 1 "DEBuG")
-    (do
-      (async-kicker options)
-      (doseq [line (line-seq (java.io.BufferedReader. *in*))]
-        (>!! in line)))))
+    ;
+    (if (nil? (:genfunc options))
+        (do (async-kicker options)
+          (doseq [line (line-seq (java.io.BufferedReader. *in*))]
+            (>!! in line)))
+      (let [strFunc (str (:genfunc options))
+            refFunc (ns-resolve 'aolsender.genfunc (symbol strFunc))]
+        ;http://bit.ly/1L5hIJZ
+        (if (not (ifn? (deref refFunc)))
+          (do (println "Cannot find data generation function:" strFunc )
+            (exit 0 (usage summary)))
+          (do (println (str "Using aolsender.genfunc/" strFunc " for data generation"))
+            (async-kicker options)
+            (while true (>!! in (refFunc)))) ))) ))
