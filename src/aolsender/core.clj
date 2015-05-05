@@ -26,6 +26,9 @@
    ["-n" "--numthread 8" "Num of Sending threads"
     :id :numthread
     :default 8]
+   ["-b" "--beacon" "For using beacon data"
+    :id :beacon
+    :default false]
    ["-h" "--help" "Show this help msg"]])
 
 (defn exit [status msg]
@@ -77,7 +80,22 @@
       (thread
         (while true
           (let [line (<!! slow-chan)]
-            (postEachLine options (clojure.string/trim-newline line))))))))
+            (postEachLine options line)))))))
+
+(def VALID-CHARS
+ (seq "abcdefghijklmnopqrstuwvxyz")
+;  (map char (concat (range 48 58) ; 0-9
+;                    (range 66 91) ; A-Z
+;                    (range 97 123)))
+  ) ; a-z
+
+(defn random-char []
+  (let [pos (rand-int (count VALID-CHARS))
+        chr (nth VALID-CHARS pos)]
+    (str chr)))
+
+(defn random-str [length]
+  (apply str (take length (repeatedly random-char))))
 
 (defn -main
   "Main function called via 'lein run'"
@@ -93,9 +111,21 @@
       (do (println "Userid have to be defined using \"-t\" option")
         (exit 0 (usage summary)))
       (println "Userid: " (:userid options)))
+
+    (async-kicker options)
+
+    (if :beacon
+      (do (println "BEACON TST")
+        (while true
+          (let [A {:uid (random-char)
+                   :bid (random-char)
+                   :time (System/currentTimeMillis)}]
+            ;(println A)
+            (>!! in A)
+            ))))
+
     (println (str "aolsender started with " (:persec options) " per sec limit."))
     ;(pprint options)(exit 1 "DEBuG")
     (do
-      (async-kicker options)
       (doseq [line (line-seq (java.io.BufferedReader. *in*))]
         (>!! in line)))))
